@@ -13,4 +13,8 @@ private[weaver] trait ClueHelpers {
   inline def clue[A](value: A)(
       using catsShow: Show[A] = Show.fromToString[A],
       clues: Clues): A = ${ ClueMacro.clueImpl('value, 'catsShow, 'clues) }
+
+  extension[A](value: A)(using catsShow: Show[A] = Show.fromToString[A], clues: Clues) {
+    inline def clue1: A = clue(value)
+  }
 }

@@ -475,6 +475,30 @@ object DogFoodTests extends IOSuite {
     }
   }
 
+  test("clue can be used as an extension") {
+    _.runSuite(Meta.Clue).map {
+      case (logs, _) =>
+        val actual = extractFailureMessageForTest(logs, "(extension)")
+
+        val expected =
+          s"""
+        |- (extension) 0ms
+        |  assertion failed (modules/framework-cats/shared/src/test/scala/Meta.scala:134)
+        |
+        |  expect(x.clue == y.clue)
+        |
+        |  Clues {
+        |    x: Int = 1
+        |    y: Int = 2
+        |  }
+        |
+        """.stripMargin.trim
+
+        expect.same(expected, actual)
+    }
+
+  }
+
   private def outputBeforeFailures(logs: Chain[LoggedEvent]): Chain[String] = {
     logs
       .takeWhile {

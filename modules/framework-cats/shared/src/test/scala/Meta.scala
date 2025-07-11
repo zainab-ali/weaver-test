@@ -128,6 +128,11 @@ object Meta {
       expect(CustomHelpers.clue(x) == otherclue(y) || x == clue(z))
     }
 
+    pureTest("(extension)") {
+      val x = 1
+      val y = 2
+      expect(x.clue1 == y.clue1)
+    }
   }
 
   object FailingTestStatusReporting extends SimpleIOSuite {
