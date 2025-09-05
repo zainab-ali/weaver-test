@@ -2,7 +2,7 @@ package weaver
 
 import cats.data.NonEmptyVector
 
-object TestErrorFormatter {
+private[weaver] object TestErrorFormatter {
 
   def formatStackTrace(
       ex: Throwable,

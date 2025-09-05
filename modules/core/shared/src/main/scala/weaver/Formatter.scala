@@ -11,7 +11,7 @@ import weaver.Log.{ debug, error, info, warn }
 import Colours._
 import LogFormatter.{ formatTimestamp }
 
-object Formatter {
+private[weaver] object Formatter {
   val EOL        = java.lang.System.lineSeparator()
   val DOUBLE_EOL = EOL * 2
 
