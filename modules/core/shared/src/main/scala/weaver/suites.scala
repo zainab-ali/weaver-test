@@ -20,7 +20,7 @@ protected[weaver] trait EffectSuiteAux {
 }
 
 // format: off
-trait EffectSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux  { self =>
+private[weaver] trait EffectSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux  { self =>
 
   final type EffectType[A] = F[A]
   protected def effectCompat: UnsafeRun[F]
