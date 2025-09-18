@@ -47,7 +47,7 @@ private[weaver] abstract class RunnableSuite[F[_]] extends BaseSuiteClass with E
 
   private[weaver] def isCI: Boolean = System.getenv("CI") == "true"
 
-  private[weaver] def analyze[Res, F1[_]](testSeq: Seq[(TestName, Res => F1[TestOutcome])], args: List[String]): TagAnalysisResult[Res, F1] = {
+  private[weaver] final def analyze[Res, F1[_]](testSeq: Seq[(TestName, Res => F1[TestOutcome])], args: List[String]): TagAnalysisResult[Res, F1] = {
     val testsNotIgnored: Seq[(TestName, Res => F1[TestOutcome])] =
       testSeq.filterNot(_._1.tags(TestName.Tags.ignore))
 
