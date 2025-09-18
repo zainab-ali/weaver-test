@@ -29,7 +29,7 @@ object EffectSuite {
 }
 
 @RunWith(classOf[weaver.junit.WeaverRunner])
-private[weaver] abstract class RunnableSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux { self =>
+abstract class RunnableSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux { self =>
 
   final type EffectType[A] = F[A]
   protected def effectCompat: UnsafeRun[F]
