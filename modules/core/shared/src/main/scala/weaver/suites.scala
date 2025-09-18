@@ -43,12 +43,12 @@ object EffectSuite {
 
 @RunWith(classOf[weaver.junit.WeaverRunner])
 abstract class RunnableSuite[F[_]] extends EffectSuite[F] {
-  private[weaver] def getEffectCompat: UnsafeRun[EffectType] = effectCompat
-  def plan : List[TestName]
+  private[weaver] final def getEffectCompat: UnsafeRun[EffectType] = effectCompat
+  private[weaver] def plan : List[TestName]
   private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =
     effectCompat.unsafeRunSync(run(args)(outcome => effectCompat.effect.delay(report(outcome))))
 
-  def isCI: Boolean = System.getenv("CI") == "true"
+  private[weaver] def isCI: Boolean = System.getenv("CI") == "true"
 
   private[weaver] def analyze[Res, F1[_]](testSeq: Seq[(TestName, Res => F1[TestOutcome])], args: List[String]): TagAnalysisResult[Res, F1] = {
     val testsNotIgnored: Seq[(TestName, Res => F1[TestOutcome])] =
