@@ -131,9 +131,7 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
             resource <- Stream.resource(sharedResource)
             tests      = filteredTests.map(_.apply(resource))
             testStream = Stream.emits(tests).covary[F]
-            result <- if (parallelism > 1)
-              testStream.parEvalMap(parallelism)(identity)(effectCompat.effect)
-            else testStream.evalMap(identity)
+            result <- testStream.parEvalMap(parallelism)(identity)(effectCompat.effect)
           } yield result
       }
     }
