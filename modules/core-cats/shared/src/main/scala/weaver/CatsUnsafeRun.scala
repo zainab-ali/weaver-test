@@ -14,9 +14,8 @@ trait CatsUnsafeRun extends UnsafeRun[IO] with CatsUnsafeRunPlatformCompat {
   override implicit val parallel = IO.parallelForIO
   override implicit val effect   = IO.asyncForIO
 
-  def cancel(token: CancelToken): Unit = unsafeRunSync(token.cancel)
+  def cancel(token: CancelToken): Unit = token.cancel.unsafeRunSync()
 
-  def unsafeRunAndForget(task: IO[Unit]): Unit = task.unsafeRunAndForget()
   def unsafeRunToFuture(task: IO[Unit]): Future[Unit] = task.unsafeToFuture()
 
 }

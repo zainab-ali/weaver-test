@@ -29,7 +29,7 @@ protected[weaver] trait EffectSuiteAux {
 trait EffectSuite[F[_]] extends Suite[F] with EffectSuiteAux { self =>
 
   final type EffectType[A] = F[A]
-  implicit protected def effectCompat: EffectCompat[F]
+  implicit protected def effectCompat: UnsafeRun[F]
   implicit final protected def effect: Async[F] = effectCompat.effect
 
   override def name : String = self.getClass.getName.replace("$", "")
@@ -50,7 +50,6 @@ object EffectSuite {
 
 @RunWith(classOf[weaver.junit.WeaverRunner])
 abstract class RunnableSuite[F[_]] extends EffectSuite[F] {
-  implicit protected def effectCompat: UnsafeRun[EffectType]
   private[weaver] def getEffectCompat: UnsafeRun[EffectType] = effectCompat
   def plan : List[TestName]
   private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =

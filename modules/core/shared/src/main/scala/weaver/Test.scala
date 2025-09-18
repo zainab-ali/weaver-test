@@ -11,7 +11,7 @@ import cats.syntax.all._
 object Test {
 
   def apply[F[_]](name: String, f: Log[F] => F[Expectations])(
-      implicit F: EffectCompat[F]
+      implicit F: UnsafeRun[F]
   ): F[TestOutcome] = {
     import F.effect
     for {
@@ -39,7 +39,7 @@ object Test {
   }
 
   def apply[F[_]](name: String, f: F[Expectations])(
-      implicit F: EffectCompat[F]
+      implicit F: UnsafeRun[F]
   ): F[TestOutcome] = apply[F](name, (_: Log[F]) => f)
 
 }
