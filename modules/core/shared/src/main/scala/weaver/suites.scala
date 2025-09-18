@@ -4,7 +4,6 @@ import scala.concurrent.duration.FiniteDuration
 
 import cats.data.Chain
 import cats.effect.{ Async, Resource }
-import cats.syntax.all._
 
 import fs2.Stream
 import org.portablescala.reflect.annotation.EnableReflectiveInstantiation
@@ -30,10 +29,8 @@ trait EffectSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux  { self =>
   def name: String = self.getClass.getName.replace("$", "")
   def spec(args: List[String]): Stream[F, TestOutcome]
 
-  protected def adaptRunError: PartialFunction[Throwable, Throwable] = PartialFunction.empty
-
   private[weaver] final def run(args : List[String])(report : TestOutcome => F[Unit]) : F[Unit] =
-    spec(args).evalMap(report).compile.drain.adaptErr(adaptRunError)
+    spec(args).evalMap(report).compile.drain
 }
 
 object EffectSuite {
