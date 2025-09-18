@@ -157,7 +157,7 @@ object Expectations {
           ))
     }
 
-  trait Helpers extends weaver.internals.ClueHelpers {
+  trait Helpers extends weaver.internals.ClueHelpers with SourceLocation.Here {
 
     /**
      * Expect macros

@@ -26,7 +26,7 @@ protected[weaver] trait EffectSuiteAux {
 }
 
 // format: off
-trait EffectSuite[F[_]] extends Suite[F] with EffectSuiteAux with SourceLocation.Here { self =>
+trait EffectSuite[F[_]] extends Suite[F] with EffectSuiteAux { self =>
 
   final type EffectType[A] = F[A]
   implicit protected def effectCompat: EffectCompat[F]
