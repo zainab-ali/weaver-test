@@ -76,7 +76,7 @@ trait DisciplineFSuite[F[_]] extends RunnableSuite[F] {
             foundProps.synchronized {
               foundProps += name.copy(propTestName)
             }
-            Test(propTestName, runProp)
+            Test(propTestName, runProp)(effectCompat)
         }).run
       )
     }
