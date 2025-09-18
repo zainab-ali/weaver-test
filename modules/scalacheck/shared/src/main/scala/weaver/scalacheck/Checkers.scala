@@ -26,13 +26,13 @@ trait Checkers {
 
     def apply[A1: Arbitrary: Show, B: PropF](f: A1 => B)(
         implicit loc: SourceLocation): F[Expectations] =
-      forall(implicitly[Arbitrary[A1]].arbitrary)(liftProp[A1, B](f))
+      apply(implicitly[Arbitrary[A1]].arbitrary)(liftProp[A1, B](f))
 
     def apply[A1: Arbitrary: Show, A2: Arbitrary: Show, B: PropF](f: (
         A1,
         A2) => B)(
         implicit loc: SourceLocation): F[Expectations] =
-      forall(implicitly[Arbitrary[(A1, A2)]].arbitrary)(liftProp(
+      apply(implicitly[Arbitrary[(A1, A2)]].arbitrary)(liftProp(
         f.tupled))
 
     def apply[
@@ -45,7 +45,7 @@ trait Checkers {
       implicit val tuple3Show: Show[(A1, A2, A3)] = {
         case (a1, a2, a3) => s"(${a1.show},${a2.show},${a3.show})"
       }
-      forall(implicitly[Arbitrary[(A1, A2, A3)]].arbitrary)(liftProp(
+      apply(implicitly[Arbitrary[(A1, A2, A3)]].arbitrary)(liftProp(
         f.tupled))
     }
 
@@ -61,7 +61,7 @@ trait Checkers {
         case (a1, a2, a3, a4) =>
           s"(${a1.show},${a2.show},${a3.show},${a4.show})"
       }
-      forall(implicitly[Arbitrary[(A1, A2, A3, A4)]].arbitrary)(
+      apply(implicitly[Arbitrary[(A1, A2, A3, A4)]].arbitrary)(
         liftProp(f.tupled))
     }
 
@@ -78,7 +78,7 @@ trait Checkers {
         case (a1, a2, a3, a4, a5) =>
           s"(${a1.show},${a2.show},${a3.show},${a4.show},${a5.show})"
       }
-      forall(implicitly[Arbitrary[(A1, A2, A3, A4, A5)]].arbitrary)(
+      apply(implicitly[Arbitrary[(A1, A2, A3, A4, A5)]].arbitrary)(
         liftProp(f.tupled))
     }
 
@@ -96,7 +96,7 @@ trait Checkers {
         case (a1, a2, a3, a4, a5, a6) =>
           s"(${a1.show},${a2.show},${a3.show},${a4.show},${a5.show},${a6.show})"
       }
-      forall(implicitly[Arbitrary[(A1, A2, A3, A4, A5, A6)]].arbitrary)(
+      apply(implicitly[Arbitrary[(A1, A2, A3, A4, A5, A6)]].arbitrary)(
         liftProp(f.tupled))
     }
 
