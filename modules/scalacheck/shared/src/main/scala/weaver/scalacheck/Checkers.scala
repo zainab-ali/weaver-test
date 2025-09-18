@@ -11,9 +11,9 @@ trait Checkers {
   self: EffectSuiteAux =>
   import Checkers._
 
-  type F[A] = this.EffectType[A]
+  private type F[A] = this.EffectType[A]
 
-  type PropF[A] = Prop[F, A]
+  private type PropF[A] = Prop[F, A]
 
   private def liftProp[A, B: PropF](f: A => B): A => F[Expectations] = {
     f andThen (b => Prop[F, B].lift(b))
