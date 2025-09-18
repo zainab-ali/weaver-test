@@ -15,8 +15,8 @@ trait BaseSuiteClass {}
 
 // A version of EffectSuite that has a type member instead of a type parameter.
 protected[weaver] trait EffectSuiteAux {
-  protected type EffectType[A]
-  implicit protected def effect: Async[EffectType]
+  protected[weaver] type EffectType[A]
+  protected[weaver] def effect: Async[EffectType]
 }
 
 // format: off
@@ -31,9 +31,9 @@ object EffectSuite {
 @RunWith(classOf[weaver.junit.WeaverRunner])
 abstract class RunnableSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux { self =>
 
-  final type EffectType[A] = F[A]
+  protected[weaver] final type EffectType[A] = F[A]
   protected def effectCompat: UnsafeRun[F]
-  implicit final protected def effect: Async[F] = effectCompat.effect
+  implicit final protected[weaver] def effect: Async[F] = effectCompat.effect
 
   def name: String = self.getClass.getName.replace("$", "")
   private[weaver] def spec(args: List[String]): Stream[F, TestOutcome]

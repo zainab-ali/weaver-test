@@ -6,6 +6,7 @@ import cats.{ Applicative, Defer, Show }
 
 import org.scalacheck.rng.Seed
 import org.scalacheck.{ Arbitrary, Gen }
+import cats.effect.Concurrent
 
 trait Checkers {
   self: EffectSuiteAux =>
@@ -106,6 +107,7 @@ trait Checkers {
 
     private def forall_[A: Show](gen: Gen[A], f: A => F[Expectations])(
         implicit loc: SourceLocation): F[Expectations] = {
+      implicit val concurrentInstance: Concurrent[F] = self.effect
       val params = Gen.Parameters.default.withNoInitialSeed.withSize(
         config.maximumGeneratorSize)
       val initialSeed = config.initialSeed.getOrElse(Seed.random())
@@ -138,6 +140,7 @@ trait Checkers {
       f: T => F[Expectations])(
       params: Gen.Parameters,
       seed: Seed): F[TestResult] = {
+    implicit val applicativeInstance: Applicative[F] = self.effect
     Defer[F](self.effect).defer {
       gen(params, seed)
         .traverse(x => f(x).map(x -> _))
@@ -200,7 +203,8 @@ object Checkers {
   }
 
   object Prop {
-    private[scalacheck] def apply[F[_], B](implicit ev: Prop[F, B]): Prop[F, B] = ev
+    private[scalacheck] def apply[F[_], B](implicit
+        ev: Prop[F, B]): Prop[F, B] = ev
 
     implicit def wrap[F[_]: Applicative]: Prop[F, Expectations] =
       new Prop[F, Expectations] {
