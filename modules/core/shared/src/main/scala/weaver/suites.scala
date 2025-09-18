@@ -43,8 +43,7 @@ private[weaver] abstract class RunnableSuite[F[_]] extends BaseSuiteClass with E
 
   private[weaver] final def getEffectCompat: UnsafeRun[EffectType] = effectCompat
   private[weaver] def plan : List[TestName]
-  private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =
-    effectCompat.unsafeRunSync(run(args)(outcome => effectCompat.effect.delay(report(outcome))))
+  private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit
 
   private[weaver] def isCI: Boolean = System.getenv("CI") == "true"
 
@@ -116,6 +115,9 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
     // this alias helps using pattern matching on `Res`
     def usingRes(run : Res => F[Expectations]) : Unit = apply(run)
   }
+
+  private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =
+    effectCompat.unsafeRunSync(run(args)(outcome => effectCompat.effect.delay(report(outcome))))
 
   override def spec(args: List[String]): Stream[F, TestOutcome] =
     synchronized {
