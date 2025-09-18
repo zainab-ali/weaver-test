@@ -99,7 +99,7 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
 
   protected def registerTest(name: TestName)(f: Res => F[TestOutcome]): Unit =
     synchronized {
-      if (isInitialized) throw initError()
+      if (isInitialized) throw initError
       testSeq = testSeq :+ (name -> f)
     }
 
@@ -145,12 +145,6 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
   def plan: List[TestName] = testSeq.map(_._1).toList
 
   private[this] var isInitialized = false
-
-  private[this] def initError() =
-    new AssertionError(
-      "Cannot define new tests after TestSuite was initialized"
-    )
-
 }
 
 private[weaver] trait FunSuiteAux {

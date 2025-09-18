@@ -51,7 +51,7 @@ trait DisciplineFSuite[F[_]] extends RunnableSuite[F] {
 
   protected def registerTest(tests: Res => F[List[F[TestOutcome]]]): Unit =
     registeredTests.synchronized {
-      if (isInitialized) throw initError()
+      if (isInitialized) throw initError
       registeredTests += tests
       ()
     }
@@ -115,9 +115,6 @@ trait DisciplineFSuite[F[_]] extends RunnableSuite[F] {
     mutable.Buffer.empty[Res => F[List[F[TestOutcome]]]]
 
   private[this] var isInitialized = false
-
-  private[this] def initError() = new AssertionError(
-    "Cannot define new tests after TestSuite was initialized")
 }
 
 object Discipline {
