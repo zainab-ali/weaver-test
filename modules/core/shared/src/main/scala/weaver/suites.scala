@@ -29,7 +29,7 @@ protected[weaver] trait EffectSuiteAux {
 trait EffectSuite[F[_]] extends Suite[F] with EffectSuiteAux { self =>
 
   final type EffectType[A] = F[A]
-  implicit protected def effectCompat: UnsafeRun[F]
+  protected def effectCompat: UnsafeRun[F]
   implicit final protected def effect: Async[F] = effectCompat.effect
 
   override def name : String = self.getClass.getName.replace("$", "")
@@ -113,14 +113,14 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
       testSeq = testSeq :+ (name -> f)
     }
 
-  def pureTest(name: TestName)(run : => Expectations) :  Unit = registerTest(name)(_ => Test(name.name, effectCompat.effect.delay(run)))
-  def loggedTest(name: TestName)(run: Log[F] => F[Expectations]) : Unit = registerTest(name)(_ => Test[F](name.name, log => run(log)))
+  def pureTest(name: TestName)(run : => Expectations) :  Unit = registerTest(name)(_ => Test(name.name, effectCompat.effect.delay(run))(effectCompat))
+  def loggedTest(name: TestName)(run: Log[F] => F[Expectations]) : Unit = registerTest(name)(_ => Test[F](name.name, log => run(log))(effectCompat))
   def test(name: TestName) : PartiallyAppliedTest = new PartiallyAppliedTest(name)
 
   class PartiallyAppliedTest(name : TestName) {
-    def apply(run: => F[Expectations]) : Unit = registerTest(name)(_ => Test(name.name, run))
-    def apply(run : Res => F[Expectations]) : Unit = registerTest(name)(res => Test(name.name, run(res)))
-    def apply(run : (Res, Log[F]) => F[Expectations]) : Unit = registerTest(name)(res => Test[F](name.name, log => run(res, log)))
+    def apply(run: => F[Expectations]) : Unit = registerTest(name)(_ => Test(name.name, run)(effectCompat))
+    def apply(run : Res => F[Expectations]) : Unit = registerTest(name)(res => Test(name.name, run(res))(effectCompat))
+    def apply(run : (Res, Log[F]) => F[Expectations]) : Unit = registerTest(name)(res => Test[F](name.name, log => run(res, log))(effectCompat))
 
     // this alias helps using pattern matching on `Res`
     def usingRes(run : Res => F[Expectations]) : Unit = apply(run)

@@ -10,9 +10,7 @@ import cats.syntax.all._
 
 object Test {
 
-  def apply[F[_]](name: String, f: Log[F] => F[Expectations])(
-      implicit F: UnsafeRun[F]
-  ): F[TestOutcome] = {
+  def apply[F[_]](name: String, f: Log[F] => F[Expectations])(F: UnsafeRun[F]): F[TestOutcome] = {
     import F.effect
     for {
       ref   <- Ref[F].of(Chain.empty[Log.Entry])
@@ -39,7 +37,7 @@ object Test {
   }
 
   def apply[F[_]](name: String, f: F[Expectations])(
-      implicit F: UnsafeRun[F]
-  ): F[TestOutcome] = apply[F](name, (_: Log[F]) => f)
+      F: UnsafeRun[F]
+  ): F[TestOutcome] = apply[F](name, (_: Log[F]) => f)(F)
 
 }
