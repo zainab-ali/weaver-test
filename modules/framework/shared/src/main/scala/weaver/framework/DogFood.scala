@@ -60,7 +60,7 @@ private[weaver] class DogFood[F[_]](val framework: WeaverFramework[F])
     runSuites(Fingerprinted.ModuleSuite(suiteName))
 
   // Method used to run a test-suite
-  def runSuite(suite: EffectSuite[F]): F[State] =
+  def runSuite(suite: RunnableSuite[F]): F[State] =
     runSuite(suite.getClass.getName.dropRight(1))
 
   def isSuccess(event: sbt.testing.Event)(
@@ -106,7 +106,7 @@ private[weaver] class DogFood[F[_]](val framework: WeaverFramework[F])
 
   def globalInit(g: GlobalResourceF[F]): Fingerprinted =
     Fingerprinted.GlobalInit(g.getClass.getName.dropRight(1))
-  def moduleSuite(g: EffectSuite[F]): Fingerprinted =
+  def moduleSuite(g: RunnableSuite[F]): Fingerprinted =
     Fingerprinted.ModuleSuite(g.getClass.getName.dropRight(1))
   def sharingSuite[S <: BaseSuiteClass](
       implicit ct: ClassTag[S]): Fingerprinted =

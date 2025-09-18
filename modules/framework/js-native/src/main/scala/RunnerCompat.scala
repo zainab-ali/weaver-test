@@ -98,7 +98,7 @@ trait RunnerCompat[F[_]] { self: sbt.testing.Runner =>
 
       def runSuite(
           fqn: String,
-          suite: EffectSuite[F],
+          suite: RunnableSuite[F],
           outcomes: Ref[F, Chain[TestOutcome]]): F[Unit] = for {
         _ <- effect.delay(Reporter.logSuiteStarted(loggers)(SuiteName(fqn)))
         _ <- suite.run(args.toList) { outcome =>

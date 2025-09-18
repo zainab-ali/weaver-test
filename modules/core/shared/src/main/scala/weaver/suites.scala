@@ -20,7 +20,16 @@ protected[weaver] trait EffectSuiteAux {
 }
 
 // format: off
-private[weaver] trait EffectSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux  { self =>
+object EffectSuite {
+
+  trait Provider[F[_]]{
+    def getSuite : RunnableSuite[F]
+  }
+
+}
+
+@RunWith(classOf[weaver.junit.WeaverRunner])
+abstract class RunnableSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux { self =>
 
   final type EffectType[A] = F[A]
   protected def effectCompat: UnsafeRun[F]
@@ -31,18 +40,7 @@ private[weaver] trait EffectSuite[F[_]] extends BaseSuiteClass with EffectSuiteA
 
   private[weaver] final def run(args : List[String])(report : TestOutcome => F[Unit]) : F[Unit] =
     spec(args).evalMap(report).compile.drain
-}
 
-object EffectSuite {
-
-  trait Provider[F[_]]{
-    def getSuite : EffectSuite[F]
-  }
-
-}
-
-@RunWith(classOf[weaver.junit.WeaverRunner])
-abstract class RunnableSuite[F[_]] extends EffectSuite[F] {
   private[weaver] final def getEffectCompat: UnsafeRun[EffectType] = effectCompat
   private[weaver] def plan : List[TestName]
   private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =

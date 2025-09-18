@@ -24,7 +24,7 @@ trait RunnerCompat[F[_]] { self: sbt.testing.Runner =>
   protected val errorStream: PrintStream
   import unsafeRun._
 
-  private type MakeSuite = GlobalResourceF.Read[F] => F[EffectSuite[F]]
+  private type MakeSuite = GlobalResourceF.Read[F] => F[RunnableSuite[F]]
 
   private var cancelToken: Option[unsafeRun.CancelToken] = None
 
