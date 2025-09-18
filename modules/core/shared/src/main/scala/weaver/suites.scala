@@ -161,8 +161,6 @@ abstract class FunSuiteF[F[_]] extends RunnableSuite[F] with FunSuiteAux { self 
     testSeq = testSeq :+ (name -> ((_: Unit) => Test.pure(name.name)(() => run)))
   }
 
-  override def name : String = self.getClass.getName.replace("$", "")
-
   private def pureSpec(args: List[String]): fs2.Stream[fs2.Pure, TestOutcome] = synchronized {
     if(!isInitialized) isInitialized = true
     analyze[Unit, cats.Id](testSeq, args) match {
