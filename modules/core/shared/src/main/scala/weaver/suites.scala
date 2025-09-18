@@ -36,7 +36,7 @@ abstract class RunnableSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux { 
   implicit final protected def effect: Async[F] = effectCompat.effect
 
   def name: String = self.getClass.getName.replace("$", "")
-  def spec(args: List[String]): Stream[F, TestOutcome]
+  private[weaver] def spec(args: List[String]): Stream[F, TestOutcome]
 
   private[weaver] final def run(args : List[String])(report : TestOutcome => F[Unit]) : F[Unit] =
     spec(args).evalMap(report).compile.drain
