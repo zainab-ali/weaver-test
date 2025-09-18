@@ -196,11 +196,11 @@ trait Checkers {
 
 object Checkers {
   trait Prop[F[_], A] {
-    def lift(a: A): F[Expectations]
+    private[scalacheck] def lift(a: A): F[Expectations]
   }
 
   object Prop {
-    def apply[F[_], B](implicit ev: Prop[F, B]): Prop[F, B] = ev
+    private[scalacheck] def apply[F[_], B](implicit ev: Prop[F, B]): Prop[F, B] = ev
 
     implicit def wrap[F[_]: Applicative]: Prop[F, Expectations] =
       new Prop[F, Expectations] {
