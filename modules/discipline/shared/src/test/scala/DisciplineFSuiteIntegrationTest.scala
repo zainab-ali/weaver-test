@@ -2,7 +2,7 @@ package weaver.discipline
 
 import cats.effect.{ IO, Resource }
 
-import weaver.{ BaseIOSuite, SimpleIOSuite }
+import weaver.{ MutableIOSuite, SimpleIOSuite }
 
 object DisciplineFSuiteIntegrationTest extends SimpleIOSuite {
 
@@ -51,7 +51,7 @@ object DisciplineFSuiteIntegrationTest extends SimpleIOSuite {
     }
   }
 
-  object MetaSuccess extends DisciplineFSuite[IO] with BaseIOSuite {
+  object MetaSuccess extends MutableIOSuite with DisciplineFSuite[IO] {
     override type Res = String
     override def sharedResource: Resource[IO, String] =
       Resource.pure("resource")
@@ -59,7 +59,7 @@ object DisciplineFSuiteIntegrationTest extends SimpleIOSuite {
     checkAll("Int").pure(_ => RickrollTests[Int].all)
   }
 
-  object MetaFailure extends DisciplineFSuite[IO] with BaseIOSuite {
+  object MetaFailure extends MutableIOSuite with DisciplineFSuite[IO] {
     override type Res = String
     override def sharedResource: Resource[IO, String] =
       Resource.pure("resource")
@@ -67,7 +67,7 @@ object DisciplineFSuiteIntegrationTest extends SimpleIOSuite {
     checkAll("Boolean").pure(_ => RickrollTests[Boolean].all)
   }
 
-  object MetaException extends DisciplineFSuite[IO] with BaseIOSuite {
+  object MetaException extends MutableIOSuite with DisciplineFSuite[IO] {
     override type Res = String
     override def sharedResource: Resource[IO, String] =
       Resource.pure("resource")
@@ -76,7 +76,7 @@ object DisciplineFSuiteIntegrationTest extends SimpleIOSuite {
   }
 
   object resourceStart extends Exception
-  object FailingResource extends DisciplineFSuite[IO] with BaseIOSuite {
+  object FailingResource extends MutableIOSuite with DisciplineFSuite[IO] {
     override type Res = String
     override def sharedResource: Resource[IO, String] =
       Resource.eval(IO.raiseError(resourceStart))
