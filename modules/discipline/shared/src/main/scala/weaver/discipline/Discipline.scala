@@ -87,6 +87,9 @@ trait DisciplineFSuite[F[_]] extends RunnableSuite[F] {
     def pure(run: Res => Laws#RuleSet): Unit = apply(run.andThen(_.pure[F]))
   }
 
+  override def runUnsafe(args: List[String])(report: TestOutcome => Unit) =
+    pureSpec(args).compile.toVector.foreach(report)
+
   override def spec(args: List[String]): Stream[F, TestOutcome] =
     registeredTests.synchronized {
       if (!isInitialized) isInitialized = true
