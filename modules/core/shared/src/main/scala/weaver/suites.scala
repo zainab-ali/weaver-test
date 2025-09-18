@@ -43,7 +43,8 @@ abstract class RunnableSuite[F[_]] extends BaseSuiteClass with EffectSuiteAux { 
 
   private[weaver] final def getEffectCompat: UnsafeRun[EffectType] = effectCompat
   private[weaver] def plan : List[TestName]
-  private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit
+  private[weaver] final def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =
+    effectCompat.unsafeRunSync(run(args)(outcome => effectCompat.effect.delay(report(outcome))))
 
   protected[weaver] def isCI: Boolean = System.getenv("CI") == "true"
 
@@ -116,9 +117,6 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
     def usingRes(run : Res => F[Expectations]) : Unit = apply(run)
   }
 
-  private[weaver] def runUnsafe(args: List[String])(report: TestOutcome => Unit) : Unit =
-    effectCompat.unsafeRunSync(run(args)(outcome => effectCompat.effect.delay(report(outcome))))
-
   override def spec(args: List[String]): Stream[F, TestOutcome] =
     synchronized {
       if (!isInitialized) isInitialized = true
@@ -167,10 +165,6 @@ abstract class FunSuiteF[F[_]] extends RunnableSuite[F] with FunSuiteAux { self 
   }
 
   override def spec(args: List[String]) = pureSpec(args).covary[F]
-
-  override def runUnsafe(args: List[String])(report: TestOutcome => Unit) =
-    pureSpec(args).compile.toVector.foreach(report)
-
 
   private[this] var testSeq = Seq.empty[(TestName, Unit => TestOutcome)]
   def plan: List[TestName] = testSeq.map(_._1).toList
