@@ -21,7 +21,7 @@ trait Suite[F[_]] extends BaseSuiteClass {
 
 // A version of EffectSuite that has a type member instead of a type parameter.
 protected[weaver] trait EffectSuiteAux {
-  type EffectType[A]
+  protected type EffectType[A]
   implicit protected def effect: Async[EffectType]
 }
 
