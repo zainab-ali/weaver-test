@@ -153,8 +153,8 @@ abstract class MutableFSuite[F[_]] extends RunnableSuite[F]  {
 
 }
 
-trait FunSuiteAux {
-  def test(name: TestName)(run: => Expectations): Unit
+private[weaver] trait FunSuiteAux {
+  private[weaver] def test(name: TestName)(run: => Expectations): Unit
 }
 
 abstract class FunSuiteF[F[_]] extends RunnableSuite[F] with FunSuiteAux { self =>
