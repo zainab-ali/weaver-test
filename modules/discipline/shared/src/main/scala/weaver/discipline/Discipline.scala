@@ -70,6 +70,7 @@ trait DisciplineFSuite[F[_]] extends RunnableSuite[F] {
         Kleisli(run).map(_.all.properties.toList.map {
           case (id, prop) =>
             val propTestName = s"${name.name}: $id"
+            // Each property is converted to its own test
             val runProp = effectCompat.effect.delay(
               executeProp(prop, name.location, parameters)
             )
@@ -87,6 +88,7 @@ trait DisciplineFSuite[F[_]] extends RunnableSuite[F] {
     def pure(run: Res => Laws#RuleSet): Unit = apply(run.andThen(_.pure[F]))
   }
 
+  // This is overridden in two places. How does it work?
   override def spec(args: List[String]): Stream[F, TestOutcome] =
     registeredTests.synchronized {
       if (!isInitialized) isInitialized = true
