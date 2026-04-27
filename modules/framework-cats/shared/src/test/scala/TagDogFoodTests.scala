@@ -26,12 +26,9 @@ object TagDogFoodTests extends IOSuite {
           .toList
         assertInlineSnapshot(
           failureMessages,
-          List(
-            """- (should-fail) 0ms
-  'Only' tag is not allowed when `isCI=true` (src/main/MaoTests.scala:1)""",
-            """- (should-also-fail) 0ms
-  'Only' tag is not allowed when `isCI=true` (src/main/MaoTests.scala:1)"""
-          )
+          List(s"""- (should-fail) 0ms
+|  'Only' tag is not allowed when `isCI=true` (src/main/MaoTests.scala:1)""".stripMargin,s"""- (should-also-fail) 0ms
+|  'Only' tag is not allowed when `isCI=true` (src/main/MaoTests.scala:1)""".stripMargin)
         )
     }
   }

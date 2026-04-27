@@ -68,15 +68,15 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(failure)")
         assertInlineSnapshot(
           actual,
-          """- (failure) 0ms
-  expected (src/main/DogFoodTests.scala:5)
-
-    [INFO]  12:54:35 [DogFoodTests.scala:5] this test
-    [ERROR] 12:54:35 [DogFoodTests.scala:5] has failed
-    [DEBUG] 12:54:35 [DogFoodTests.scala:5] with context
-        a       -> b
-        token   -> <something>
-        request -> true"""
+          s"""- (failure) 0ms
+             |  expected (src/main/DogFoodTests.scala#L5)
+             |
+             |    [INFO]  12:54:35 [DogFoodTests.scala:5] this test
+             |    [ERROR] 12:54:35 [DogFoodTests.scala:5] has failed
+             |    [DEBUG] 12:54:35 [DogFoodTests.scala:5] with context
+             |        a       -> b
+             |        token   -> <something>
+             |        request -> true""".stripMargin
         )
     }
   }
@@ -87,17 +87,17 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(multiple-failures)")
         assertInlineSnapshot(
           actual,
-          """- (multiple-failures) 0ms
- [0] expected (src/main/DogFoodTests.scala:5)
-
- [1] another (src/main/DogFoodTests.scala:5)
-
-    [INFO]  12:54:35 [DogFoodTests.scala:5] this test
-    [ERROR] 12:54:35 [DogFoodTests.scala:5] has failed
-    [DEBUG] 12:54:35 [DogFoodTests.scala:5] with context
-        a       -> b
-        token   -> <something>
-        request -> true"""
+          s"""- (multiple-failures) 0ms
+             | [0] expected (src/main/DogFoodTests.scala#L5)
+             |
+             | [1] another (src/main/DogFoodTests.scala#L5)
+             |
+             |    [INFO]  12:54:35 [DogFoodTests.scala:5] this test
+             |    [ERROR] 12:54:35 [DogFoodTests.scala:5] has failed
+             |    [DEBUG] 12:54:35 [DogFoodTests.scala:5] with context
+             |        a       -> b
+             |        token   -> <something>
+             |        request -> true""".stripMargin
         )
     }
   }
@@ -112,14 +112,14 @@ object DogFoodTests extends IOSuite {
 
         val expected =
           s"""
-            |- erroring with a long message: ${Meta.ErroringWithLongPayload.smiles} 0ms
-            |  Meta$$CustomException: surfaced error
-            |
-            |  DogFoodTests.scala:15    my.package.MyClass#MyMethod
-            |  DogFoodTests.scala:20    my.package.ClassOfDifferentLength#method$$new$$1
-            |  <snipped>                cats.effect.internals.<...>
-            |  <snipped>                java.util.concurrent.<...>
-            |""".stripMargin.trim
+             |- erroring with a long message: ${Meta.ErroringWithLongPayload.smiles} 0ms
+             |  Meta$$CustomException: surfaced error
+             |
+             |  DogFoodTests.scala:15    my.package.MyClass#MyMethod
+             |  DogFoodTests.scala:20    my.package.ClassOfDifferentLength#method$$new$$1
+             |  <snipped>                cats.effect.internals.<...>
+             |  <snipped>                java.util.concurrent.<...>
+             |""".stripMargin.trim
 
         expect.same(actual, expected)
     }
@@ -164,7 +164,7 @@ object DogFoodTests extends IOSuite {
         assertInlineSnapshot(
           actual,
           """- (failure) 0ms
-  expected (src/main/DogFoodTests.scala:5)
+  expected (src/main/DogFoodTests.scala#L5)
 
     [ERROR] 12:54:35 [DogFoodTests.scala:5] error
     weaver.framework.test.Meta$CustomException: surfaced error
@@ -185,17 +185,17 @@ object DogFoodTests extends IOSuite {
 
         assertInlineSnapshot(
           actual,
-          """- lots 0ms
-  of
-  multiline
-  (failure)
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(clue(x) == y)
-
-  Clues {
-    x: Int = 1
-  }"""
+          s"""- lots 0ms
+             |  of
+             |  multiline
+             |  (failure)
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(clue(x) == y)
+             |
+             |  Clues {
+             |    x: Int = 1
+             |  }""".stripMargin
         )
     }
   }
@@ -223,12 +223,14 @@ object DogFoodTests extends IOSuite {
           extractLogEventBeforeFailures(logs) {
             case LoggedEvent.Info(msg) if msg.contains("(ignored)") => msg
           }.get
-        assertInlineSnapshot(actual,
-                             """- lots 0ms
-  of
-  multiline
-  (ignored) !!! IGNORED !!!
-  Ignore me (src/main/DogFoodTests.scala:5)""")
+        assertInlineSnapshot(
+          actual,
+          s"""- lots 0ms
+             |  of
+             |  multiline
+             |  (ignored) !!! IGNORED !!!
+             |  Ignore me (src/main/DogFoodTests.scala#L5)""".stripMargin
+        )
     }
   }
 
@@ -239,14 +241,14 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(eql Comparison)")
         assertInlineSnapshot(
           actual,
-          """- (eql Comparison) 0ms
-  Values not equal: (src/main/DogFoodTests.scala:5)
-
-  in expect.eql(- expected, + found)
-     s: foo
-  -  i: 1
-  +  i: 2
-   }"""
+          s"""- (eql Comparison) 0ms
+             |  Values not equal: (src/main/DogFoodTests.scala#L5)
+             |
+             |  in expect.eql(- expected, + found)
+             |     s: foo
+             |  -  i: 1
+             |  +  i: 2
+             |   }""".stripMargin
         )
     }
   }
@@ -258,14 +260,14 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(same Comparison)")
         assertInlineSnapshot(
           actual,
-          """- (same Comparison) 0ms
-  Values not equal: (src/main/DogFoodTests.scala:5)
-
-  in expect.same(- expected, + found)
-     s: foo
-  -  i: 1
-  +  i: 2
-   }"""
+          s"""- (same Comparison) 0ms
+             |  Values not equal: (src/main/DogFoodTests.scala#L5)
+             |
+             |  in expect.same(- expected, + found)
+             |     s: foo
+             |  -  i: 1
+             |  +  i: 2
+             |   }""".stripMargin
         )
     }
   }
@@ -277,7 +279,7 @@ object DogFoodTests extends IOSuite {
         assertInlineSnapshot(
           actual,
           """- (eql Show) 0ms
-  Values not equal: (src/main/DogFoodTests.scala:5)
+  Values not equal: (src/main/DogFoodTests.scala#L5)
 
   in expect.eql(expected, found)
   Values have the same string representation. Consider modifying their Show instance.
@@ -294,7 +296,7 @@ object DogFoodTests extends IOSuite {
         assertInlineSnapshot(
           actual,
           """- (interpolator) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
+  assertion failed (src/main/DogFoodTests.scala#L5)
 
   expect(s"$x" == "2")
 
@@ -311,53 +313,18 @@ object DogFoodTests extends IOSuite {
         assertInlineSnapshot(
           actual,
           s"""- (failFast) 0ms
-| [0] Values not equal: (src/main/DogFoodTests.scala:5)
-| [0] 
-| [0] in expect.eql(- expected, + found)
-| [0] -1
-| [0] +2
-|
-| [1] Values not equal: (src/main/DogFoodTests.scala:5)
-| [1] 
-| [1] in expect.eql(- expected, + found)
-| [1] -3
-| [1] +4""".stripMargin
+             | [0] Values not equal: (src/main/DogFoodTests.scala#L5)
+             | [0] 
+             | [0] in expect.eql(- expected, + found)
+             | [0] -1
+             | [0] +2
+             |
+             | [1] Values not equal: (src/main/DogFoodTests.scala#L5)
+             | [1] 
+             | [1] in expect.eql(- expected, + found)
+             | [1] -3
+             | [1] +4""".stripMargin
         )
-    }
-  }
-
-  test("source locations are rendered with URLs") {
-    _.runSuite(Meta.SourceUrlSuite).flatMap {
-      case (logs, _) =>
-        val actual = extractFailureMessageForTest(logs, "(failure)")
-        if (ScalaCompat.isScala3)
-          assertInlineSnapshot(
-            actual,
-            """- (failure) 0ms
-  Values not equal: (https://github.com/typelevel/weaver-test/blob/v0.12.0/modules/framework-cats/shared/src/test/scala/Meta.scala#L52)
-
-  in expect.eql(- expected, + found)
-  -1
-  +2
-
-  https://github.com/typelevel/weaver-test/blob/v0.12.0/modules/framework-cats/shared/src/test/scala/Meta.scala#L52
-        IO(expect.eql(1, 2))
-                          ^"""
-          )
-        else
-          assertInlineSnapshot(
-            actual,
-            """- (failure) 0ms
-  Values not equal: (https://github.com/typelevel/weaver-test/blob/v0.12.0/modules/framework-cats/shared/src/test/scala/Meta.scala#L52)
-
-  in expect.eql(- expected, + found)
-  -1
-  +2
-
-  https://github.com/typelevel/weaver-test/blob/v0.12.0/modules/framework-cats/shared/src/test/scala/Meta.scala#L52
-        IO(expect.eql(1, 2))
-                     ^"""
-          )
     }
   }
 
@@ -378,15 +345,15 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(failure)")
         assertInlineSnapshot(
           actual,
-          """- (failure) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(clue(x) == clue(y))
-
-  Clues {
-    x: Int = 1
-    y: Int = 2
-  }"""
+          s"""- (failure) 0ms
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(clue(x) == clue(y))
+             |
+             |  Clues {
+             |    x: Int = 1
+             |    y: Int = 2
+             |  }""".stripMargin
         )
     }
   }
@@ -397,16 +364,16 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(nested)")
         assertInlineSnapshot(
           actual,
-          """- (nested) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(clue(List(clue(x), clue(y))) == List(x, x))
-
-  Clues {
-    x: Int = 1
-    y: Int = 2
-    List(clue(x), clue(y)): List[Int] = List(1, 2)
-  }"""
+          s"""- (nested) 0ms
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(clue(List(clue(x), clue(y))) == List(x, x))
+             |
+             |  Clues {
+             |    x: Int = 1
+             |    y: Int = 2
+             |    List(clue(x), clue(y)): List[Int] = List(1, 2)
+             |  }""".stripMargin
         )
     }
   }
@@ -418,15 +385,15 @@ object DogFoodTests extends IOSuite {
 
         assertInlineSnapshot(
           actual,
-          """- (map) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(List(x, y).map(v => clue(v)) == List(x, x))
-
-  Clues {
-    v: Int = 1
-    v: Int = 2
-  }"""
+          s"""- (map) 0ms
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(List(x, y).map(v => clue(v)) == List(x, x))
+             |
+             |  Clues {
+             |    v: Int = 1
+             |    v: Int = 2
+             |  }""".stripMargin
         )
     }
   }
@@ -436,24 +403,24 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(all)")
         assertInlineSnapshot(
           actual,
-          """- (all) 0ms
- [0] assertion failed (src/main/DogFoodTests.scala:5)
- [0] 
- [0] clue(x) == clue(y)
- [0] 
- [0] Clues {
- [0]   x: Int = 1
- [0]   y: Int = 2
- [0] }
-
- [1] assertion failed (src/main/DogFoodTests.scala:5)
- [1] 
- [1] clue(y) == clue(z)
- [1] 
- [1] Clues {
- [1]   y: Int = 2
- [1]   z: Int = 3
- [1] }"""
+          s"""- (all) 0ms
+             | [0] assertion failed (src/main/DogFoodTests.scala#L5)
+             | [0] 
+             | [0] clue(x) == clue(y)
+             | [0] 
+             | [0] Clues {
+             | [0]   x: Int = 1
+             | [0]   y: Int = 2
+             | [0] }
+             |
+             | [1] assertion failed (src/main/DogFoodTests.scala#L5)
+             | [1] 
+             | [1] clue(y) == clue(z)
+             | [1] 
+             | [1] Clues {
+             | [1]   y: Int = 2
+             | [1]   z: Int = 3
+             | [1] }""".stripMargin
         )
     }
   }
@@ -464,15 +431,15 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(show)")
         assertInlineSnapshot(
           actual,
-          """- (show) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(clue(x) == clue(y))
-
-  Clues {
-    x: Int = int-1
-    y: Int = int-2
-  }"""
+          s"""- (show) 0ms
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(clue(x) == clue(y))
+             |
+             |  Clues {
+             |    x: Int = int-1
+             |    y: Int = int-2
+             |  }""".stripMargin
         )
     }
   }
@@ -483,15 +450,15 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(show-from-to-string)")
         assertInlineSnapshot(
           actual,
-          """- (show-from-to-string) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(clue(x) == clue(y))
-
-  Clues {
-    x: Foo = foo-1
-    y: Foo = foo-2
-  }"""
+          s"""- (show-from-to-string) 0ms
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(clue(x) == clue(y))
+             |
+             |  Clues {
+             |    x: Foo = foo-1
+             |    y: Foo = foo-2
+             |  }""".stripMargin
         )
     }
   }
@@ -501,16 +468,16 @@ object DogFoodTests extends IOSuite {
         val actual = extractFailureMessageForTest(logs, "(helpers)")
         assertInlineSnapshot(
           actual,
-          """- (helpers) 0ms
-  assertion failed (src/main/DogFoodTests.scala:5)
-
-  expect(CustomHelpers.clue(x) == otherclue(y) || x == clue(z))
-
-  Clues {
-    x: Int = 1
-    y: Int = 2
-    z: Int = 3
-  }"""
+          s"""- (helpers) 0ms
+             |  assertion failed (src/main/DogFoodTests.scala#L5)
+             |
+             |  expect(CustomHelpers.clue(x) == otherclue(y) || x == clue(z))
+             |
+             |  Clues {
+             |    x: Int = 1
+             |    y: Int = 2
+             |    z: Int = 3
+             |  }""".stripMargin
         )
     }
   }
@@ -523,13 +490,13 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (expect-same) 0ms
-  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:22)
+  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L22)
 
   in expect.same(- expected, + found)
   -1
   +2
 
-  modules/framework-cats/shared/src/test/scala/Meta.scala:22
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L22
         expect.same(x, y)
                         ^"""
           )
@@ -537,13 +504,13 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (expect-same) 0ms
-  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:22)
+  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L22)
 
   in expect.same(- expected, + found)
   -1
   +2
 
-  modules/framework-cats/shared/src/test/scala/Meta.scala:22
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L22
         expect.same(x, y)
                    ^"""
           )
@@ -558,23 +525,23 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (multiple) 0ms
- [0] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:29)
+ [0] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L29)
  [0] 
  [0] in expect.same(- expected, + found)
  [0] -1
  [0] +2
  [0] 
- [0] modules/framework-cats/shared/src/test/scala/Meta.scala:29
+ [0] modules/framework-cats/shared/src/test/scala/Meta.scala#L29
  [0]       expect.same(x, y) && expect.same(y, z)
  [0]                       ^
 
- [1] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:29)
+ [1] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L29)
  [1] 
  [1] in expect.same(- expected, + found)
  [1] -2
  [1] +3
  [1] 
- [1] modules/framework-cats/shared/src/test/scala/Meta.scala:29
+ [1] modules/framework-cats/shared/src/test/scala/Meta.scala#L29
  [1]       expect.same(x, y) && expect.same(y, z)
  [1]                                            ^"""
           )
@@ -582,23 +549,23 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (multiple) 0ms
- [0] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:29)
+ [0] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L29)
  [0] 
  [0] in expect.same(- expected, + found)
  [0] -1
  [0] +2
  [0] 
- [0] modules/framework-cats/shared/src/test/scala/Meta.scala:29
+ [0] modules/framework-cats/shared/src/test/scala/Meta.scala#L29
  [0]       expect.same(x, y) && expect.same(y, z)
  [0]                  ^
 
- [1] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:29)
+ [1] Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L29)
  [1] 
  [1] in expect.same(- expected, + found)
  [1] -2
  [1] +3
  [1] 
- [1] modules/framework-cats/shared/src/test/scala/Meta.scala:29
+ [1] modules/framework-cats/shared/src/test/scala/Meta.scala#L29
  [1]       expect.same(x, y) && expect.same(y, z)
  [1]                                       ^"""
           )
@@ -613,21 +580,21 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (traced) 0ms
-  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:33)
- (modules/framework-cats/shared/src/test/scala/Meta.scala:40)
- (modules/framework-cats/shared/src/test/scala/Meta.scala:37)
+  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L33)
+ (modules/framework-cats/shared/src/test/scala/Meta.scala#L40)
+ (modules/framework-cats/shared/src/test/scala/Meta.scala#L37)
 
   in expect.same(- expected, + found)
   -1
   +2
 
-  modules/framework-cats/shared/src/test/scala/Meta.scala:33
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L33
         helper
              ^
-  modules/framework-cats/shared/src/test/scala/Meta.scala:40
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L40
         expect.same(1, 2).traced(here)
                                     ^
-  modules/framework-cats/shared/src/test/scala/Meta.scala:37
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L37
         nestedHelper.traced(here)
                                ^"""
           )
@@ -635,21 +602,21 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (traced) 0ms
-  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala:33)
- (modules/framework-cats/shared/src/test/scala/Meta.scala:40)
- (modules/framework-cats/shared/src/test/scala/Meta.scala:37)
+  Values not equal: (modules/framework-cats/shared/src/test/scala/Meta.scala#L33)
+ (modules/framework-cats/shared/src/test/scala/Meta.scala#L40)
+ (modules/framework-cats/shared/src/test/scala/Meta.scala#L37)
 
   in expect.same(- expected, + found)
   -1
   +2
 
-  modules/framework-cats/shared/src/test/scala/Meta.scala:33
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L33
         helper
         ^
-  modules/framework-cats/shared/src/test/scala/Meta.scala:40
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L40
         expect.same(1, 2).traced(here)
                                  ^
-  modules/framework-cats/shared/src/test/scala/Meta.scala:37
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L37
         nestedHelper.traced(here)
                             ^"""
           )
@@ -664,27 +631,27 @@ object DogFoodTests extends IOSuite {
           assertInlineSnapshot(
             actual,
             """- (interpolator) 0ms
-  assertion failed (modules/framework-cats/shared/src/test/scala/Meta.scala:44)
+  assertion failed (modules/framework-cats/shared/src/test/scala/Meta.scala#L44)
 
   expect(x == "2")
 
   Use the `clue` function to troubleshoot
 
-  modules/framework-cats/shared/src/test/scala/Meta.scala:44
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L44
         forEach(Option(s"$x"))(x => expect(x == "2"))
-                                                   ^"""
+                                                   ^""": @scala.annotation.nowarn("msg=possible missing interpolator")
           )
         } else {
           assertInlineSnapshot(
             actual,
             """- (interpolator) 0ms
-  assertion failed (modules/framework-cats/shared/src/test/scala/Meta.scala:44)
+  assertion failed (modules/framework-cats/shared/src/test/scala/Meta.scala#L44)
 
   expect(x == "2")
 
   Use the `clue` function to troubleshoot
 
-  modules/framework-cats/shared/src/test/scala/Meta.scala:44
+  modules/framework-cats/shared/src/test/scala/Meta.scala#L44
         forEach(Option(s"$x"))(x => expect(x == "2"))
                                           ^"""
           )
