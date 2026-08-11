@@ -32,8 +32,10 @@ ThisBuild / tlCiReleaseBranches := List("main")
 // use JDK 11
 ThisBuild / githubWorkflowJavaVersions := Seq(JavaSpec.temurin("11"))
 
-val scala212 = "2.12.21"
-val scala213 = "2.13.18"
+val scala212         = "2.12.21"
+val scala213         = "2.13.18"
+val scala3           = "3.3.8"
+val allScalaVersions = Seq(scala212, scala213, "3.3.8")
 ThisBuild / crossScalaVersions := Seq(scala212, scala213, "3.3.8")
 ThisBuild / scalaVersion       := scala213 // the default Scala
 
@@ -62,8 +64,30 @@ lazy val root = tlCrossRootProject.aggregate(core,
                                              scalacheck,
                                              discipline)
 
-lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("modules/core"))
+def platformSharedSourceSettings: Seq[Setting[_]] = {
+  def sharedDirs(config: Configuration) = Def.setting {
+    val axes     = virtualAxes.value
+    val isJVM    = axes.contains(VirtualAxis.jvm)
+    val isJS     = axes.contains(VirtualAxis.js)
+    val isNative = axes.contains(VirtualAxis.native)
+    val srcMain  = (config / sourceDirectory).value
+    val jsNative =
+      if (isJS || isNative) Seq(srcMain / "scala-js-native") else Nil
+    val jvmNative =
+      if (isJVM || isNative) Seq(srcMain / "scala-jvm-native") else Nil
+    jsNative ++ jvmNative
+  }
+  Seq(
+    Compile / unmanagedSourceDirectories ++= sharedDirs(Compile).value,
+    Test / unmanagedSourceDirectories ++= sharedDirs(Test).value
+  )
+}
+
+lazy val core = projectMatrix.in(file("modules/core"))
+  .jvmPlatform(scalaVersions = allScalaVersions)
+  .jsPlatform(scalaVersions = allScalaVersions)
+  .nativePlatform(scalaVersions = allScalaVersions)
+  .settings(platformSharedSourceSettings)
   .settings(
     name := "weaver-core",
     libraryDependencies ++= Seq(
@@ -91,8 +115,8 @@ lazy val munitDiffShadingSettings = Seq(
     "weaver.internal.shaded.*")
 )
 
-lazy val coreJVM = core.jvm
-  .settings(
+def addCoreJvmSettings(proj: Project): Project =
+  proj.settings(
     libraryDependencies ++= Seq(
       "org.scala-js"  %%%
         "scalajs-stubs" % Version.scalajsStubs % "provided" cross
@@ -102,12 +126,23 @@ lazy val coreJVM = core.jvm
     munitDiffShadingSettings
   ).enablePlugins(ShadingPlugin)
 
-lazy val coreJS =
-  core.js.settings(munitDiffShadingSettings).enablePlugins(ShadingPlugin)
+lazy val coreJVM_212 = addCoreJvmSettings(core.jvm(scala212))
+lazy val coreJVM     = addCoreJvmSettings(core.jvm(scala213))
+lazy val coreJVM_3   = addCoreJvmSettings(core.jvm(scala3))
 
-lazy val framework = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("modules/framework"))
+def addCoreJsSettings(proj: Project): Project =
+  proj.settings(munitDiffShadingSettings).enablePlugins(ShadingPlugin)
+
+lazy val coreJS_212 = addCoreJsSettings(core.js(scala212))
+lazy val coreJS     = addCoreJsSettings(core.js(scala213))
+lazy val coreJS_3   = addCoreJsSettings(core.js(scala3))
+
+lazy val framework = projectMatrix.in(file("modules/framework"))
+  .jvmPlatform(scalaVersions = allScalaVersions)
+  .jsPlatform(scalaVersions = allScalaVersions)
+  .nativePlatform(scalaVersions = allScalaVersions)
   .dependsOn(core)
+  .settings(platformSharedSourceSettings)
   .settings(
     name := "weaver-framework",
     libraryDependencies ++= Seq(
@@ -115,34 +150,52 @@ lazy val framework = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
-lazy val frameworkJVM = framework.jvm
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-sbt"   % "test-interface"     % Version.testInterface,
-      "org.scala-js"  %%%
-        "scalajs-stubs" % Version.scalajsStubs % "provided" cross
-        CrossVersion.for3Use2_13
+def addFrameworkJvmSettings(proj: Project): Project =
+  proj
+    .settings(
+      libraryDependencies ++= Seq(
+        "org.scala-sbt"   % "test-interface"     % Version.testInterface,
+        "org.scala-js"  %%%
+          "scalajs-stubs" % Version.scalajsStubs % "provided" cross
+          CrossVersion.for3Use2_13
+      )
     )
-  )
+lazy val frameworkJVM_212 = addFrameworkJvmSettings(framework.jvm(scala212))
+lazy val frameworkJVM     = addFrameworkJvmSettings(framework.jvm(scala213))
+lazy val frameworkJVM_3   = addFrameworkJvmSettings(framework.jvm(scala3))
 
-lazy val frameworkJS = framework.js
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion cross
-        CrossVersion.for3Use2_13
+def addFrameworkJsSettings(proj: Project): Project =
+  proj
+    .settings(
+      libraryDependencies ++= Seq(
+        "org.scala-js" %% "scalajs-test-interface" % scalaJSVersion cross
+          CrossVersion.for3Use2_13
+      )
     )
-  )
+lazy val frameworkJS_212 = addFrameworkJsSettings(framework.js(scala212))
+lazy val frameworkJS     = addFrameworkJsSettings(framework.js(scala213))
+lazy val frameworkJS_3   = addFrameworkJsSettings(framework.js(scala3))
 
-lazy val frameworkNative = framework.native
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-native" %%% "test-interface-sbt-defs" % nativeVersion
+def addFrameworkNativeSettings(proj: Project): Project =
+  proj
+    .settings(
+      libraryDependencies ++= Seq(
+        "org.scala-native" %%% "test-interface-sbt-defs" % nativeVersion
+      )
     )
-  )
+lazy val frameworkNative_212 =
+  addFrameworkNativeSettings(framework.native(scala212))
+lazy val frameworkNative =
+  addFrameworkNativeSettings(framework.native(scala213))
+lazy val frameworkNative_3 =
+  addFrameworkNativeSettings(framework.native(scala3))
 
-lazy val coreCats = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("modules/core-cats"))
+lazy val coreCats = (projectMatrix.in(file("modules/core-cats")))
+  .jvmPlatform(scalaVersions = allScalaVersions)
+  .jsPlatform(scalaVersions = allScalaVersions)
+  .nativePlatform(scalaVersions = allScalaVersions)
   .dependsOn(core)
+  .settings(platformSharedSourceSettings)
   .settings(
     libraryDependencies ++= Seq(
       "junit" % "junit" % Version.junit % ScalaDocTool
@@ -150,16 +203,23 @@ lazy val coreCats = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   )
   .settings(name := "weaver-cats-core")
 
-lazy val coreCatsJS = coreCats.js
-  .settings(
-    libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scala-js-macrotask-executor" %
-        Version.scalajsMacroTask)
-  )
+def addCoreCatsJsSettings(proj: Project): Project =
+  proj
+    .settings(
+      libraryDependencies ++= Seq(
+        "org.scala-js" %%% "scala-js-macrotask-executor" %
+          Version.scalajsMacroTask)
+    )
+lazy val coreCatsJS_212 = addCoreCatsJsSettings(coreCats.js(scala212))
+lazy val coreCatsJS     = addCoreCatsJsSettings(coreCats.js(scala213))
+lazy val coreCatsJS_3   = addCoreCatsJsSettings(coreCats.js(scala3))
 
-lazy val cats = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("modules/framework-cats"))
+lazy val cats = (projectMatrix.in(file("modules/framework-cats")))
+  .jvmPlatform(scalaVersions = allScalaVersions)
+  .jsPlatform(scalaVersions = allScalaVersions)
+  .nativePlatform(scalaVersions = allScalaVersions)
   .dependsOn(framework, coreCats)
+  .settings(platformSharedSourceSettings)
   .settings(
     name           := "weaver-cats",
     testFrameworks := Seq(new TestFramework("weaver.framework.CatsEffect")),
@@ -167,17 +227,25 @@ lazy val cats = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     // as when running locally. See `weaver.internals.SourceLocationUrl`.
     Test / envVars := Map("WEAVER_SOURCE_URL" -> "")
   )
-lazy val catsJVM = cats.jvm
-  .settings(
-    libraryDependencies +=
-      "com.siriusxm" %% "snapshot4s-core" % Version.snapshot4s % Test,
-    // Required for seting the WEAVER_SOURCE_URL environment variable.
-    Test / fork := true
-  )
-  .enablePlugins(Snapshot4sPlugin)
 
-lazy val scalacheck = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("modules/scalacheck"))
+def addCatsJvmSettings(proj: Project): Project =
+  proj
+    .settings(
+      libraryDependencies +=
+        "com.siriusxm" %% "snapshot4s-core" % Version.snapshot4s % Test,
+      // Required for seting the WEAVER_SOURCE_URL environment variable.
+      Test / fork := true
+    )
+    .enablePlugins(Snapshot4sPlugin)
+
+lazy val catsJVM_212 = addCatsJvmSettings(cats.jvm(scala212))
+lazy val catsJVM     = addCatsJvmSettings(cats.jvm(scala213))
+lazy val catsJVM_3   = addCatsJvmSettings(cats.jvm(scala3))
+
+lazy val scalacheck = (projectMatrix.in(file("modules/scalacheck")))
+  .jvmPlatform(scalaVersions = allScalaVersions)
+  .jsPlatform(scalaVersions = allScalaVersions)
+  .nativePlatform(scalaVersions = allScalaVersions)
   .dependsOn(core, cats % "test->compile")
   .settings(
     name           := "weaver-scalacheck",
@@ -187,9 +255,12 @@ lazy val scalacheck = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       "org.typelevel"  %%% "cats-effect-testkit" % Version.catsEffect % Test)
   )
 
-lazy val discipline = crossProject(JVMPlatform, JSPlatform, NativePlatform)
-  .in(file("modules/discipline"))
+lazy val discipline = (projectMatrix.in(file("modules/discipline")))
+  .jvmPlatform(scalaVersions = allScalaVersions)
+  .jsPlatform(scalaVersions = allScalaVersions)
+  .nativePlatform(scalaVersions = allScalaVersions)
   .dependsOn(core, cats)
+  .settings(platformSharedSourceSettings)
   .settings(
     name           := "weaver-discipline",
     testFrameworks := Seq(new TestFramework("weaver.framework.CatsEffect")),
@@ -199,8 +270,8 @@ lazy val discipline = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     )
   )
 
-lazy val docsOutput = crossProject(JVMPlatform)
-  .in(file("modules/docs"))
+lazy val docsOutput = (projectMatrix.in(file("modules/docs")))
+  .jvmPlatform(scalaVersions = allScalaVersions)
   .enablePlugins(NoPublishPlugin)
   .dependsOn(core, framework, coreCats, cats, scalacheck, discipline)
   .settings(
@@ -230,13 +301,14 @@ lazy val docs = project
       }
     })
   .dependsOn(
-    core.jvm,
-    framework.jvm,
-    coreCats.jvm,
-    cats.jvm,
-    scalacheck.jvm,
-    discipline.jvm,
-    docsOutput.jvm)
+    core.jvm(scala213),
+    framework.jvm(scala213),
+    coreCats.jvm(scala213),
+    cats.jvm(scala213),
+    scalacheck.jvm(scala213),
+    discipline.jvm(scala213),
+    docsOutput.jvm(scala213)
+  )
   .settings(
     moduleName := "weaver-docs",
     name       := "Weaver documentation",
