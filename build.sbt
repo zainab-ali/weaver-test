@@ -107,7 +107,7 @@ lazy val frameworkJVM = framework.jvm
 lazy val frameworkJS = framework.js
   .settings(
     libraryDependencies ++= Seq(
-      ("org.scala-js" %% "scalajs-test-interface" % scalaJSVersion).cross(CrossVersion.for3Use2_13)
+      ("org.scala-js" %% "scalajs-test-interface" % scalaJSVersion).cross(CrossVersion.for3Use2_13).platform(Platform.jvm)
     )
   )
 
