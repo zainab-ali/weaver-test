@@ -68,15 +68,15 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .settings(
     name := "weaver-core",
     libraryDependencies ++= Seq(
-      "co.fs2"        %%% "fs2-core"    % Version.fs2,
-      "org.typelevel" %%% "cats-effect" % Version.catsEffect,
+      "co.fs2"        %% "fs2-core"    % Version.fs2,
+      "org.typelevel" %% "cats-effect" % Version.catsEffect,
       // https://github.com/portable-scala/portable-scala-reflect/issues/23
-      "org.portable-scala"     %%%
+      "org.portable-scala"     %%
         "portable-scala-reflect" % Version.portableReflect cross
         CrossVersion.for3Use2_13,
       "org.typelevel" %% "scalac-compat-annotation" %
         Version.scalacCompatAnnotation,
-      "org.scalameta" %%% "munit-diff" % Version.munitDiff
+      "org.scalameta" %% "munit-diff" % Version.munitDiff
     ) ++
       (if (scalaVersion.value.startsWith("3.")) Nil
        else Seq("org.scala-lang" % "scala-reflect" % scalaVersion.value))
@@ -84,7 +84,7 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
 
 // Shades the munit-diff dependency.
 lazy val munitDiffShadingSettings = Seq(
-  shadedDependencies += "org.scalameta" %%% "munit-diff" % "<ignored>",
+  shadedDependencies += "org.scalameta" %% "munit-diff" % "<ignored>",
   shadingRules += ShadingRule.moveUnder("munit.diff",
                                         "weaver.internal.shaded"),
   validNamespaces ++= Set("weaver", "org"),
@@ -95,7 +95,7 @@ lazy val munitDiffShadingSettings = Seq(
 lazy val coreJVM = core.jvm
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js"  %%%
+      "org.scala-js"  %%
         "scalajs-stubs" % Version.scalajsStubs % "provided" cross
         CrossVersion.for3Use2_13,
       "junit" % "junit" % Version.junit % Optional
@@ -120,7 +120,7 @@ lazy val frameworkJVM = framework.jvm
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-sbt"   % "test-interface"     % Version.testInterface,
-      "org.scala-js"  %%%
+      "org.scala-js"  %%
         "scalajs-stubs" % Version.scalajsStubs % "provided" cross
         CrossVersion.for3Use2_13
     )
@@ -137,7 +137,7 @@ lazy val frameworkJS = framework.js
 lazy val frameworkNative = framework.native
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-native" %%% "test-interface-sbt-defs" % nativeVersion
+      "org.scala-native" %% "test-interface-sbt-defs" % nativeVersion
     )
   )
 
@@ -154,7 +154,7 @@ lazy val coreCats = crossProject(JVMPlatform, JSPlatform, NativePlatform)
 lazy val coreCatsJS = coreCats.js
   .settings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scala-js-macrotask-executor" %
+      "org.scala-js" %% "scala-js-macrotask-executor" %
         Version.scalajsMacroTask)
   )
 
@@ -184,8 +184,8 @@ lazy val scalacheck = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     name           := "weaver-scalacheck",
     testFrameworks := Seq(new TestFramework("weaver.framework.CatsEffect")),
     libraryDependencies ++= Seq(
-      "org.scalacheck" %%% "scalacheck"          % Version.scalacheck,
-      "org.typelevel"  %%% "cats-effect-testkit" % Version.catsEffect % Test)
+      "org.scalacheck" %% "scalacheck"          % Version.scalacheck,
+      "org.typelevel"  %% "cats-effect-testkit" % Version.catsEffect % Test)
   )
 
 lazy val discipline = crossProject(JVMPlatform, JSPlatform, NativePlatform)
@@ -195,8 +195,8 @@ lazy val discipline = crossProject(JVMPlatform, JSPlatform, NativePlatform)
     name           := "weaver-discipline",
     testFrameworks := Seq(new TestFramework("weaver.framework.CatsEffect")),
     libraryDependencies ++= Seq(
-      "org.typelevel" %%% "discipline-core" % Version.discipline,
-      "org.typelevel" %%% "cats-laws"       % Version.catsLaws % Test
+      "org.typelevel" %% "discipline-core" % Version.discipline,
+      "org.typelevel" %% "cats-laws"       % Version.catsLaws % Test
     )
   )
 
