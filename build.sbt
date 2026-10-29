@@ -53,8 +53,9 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       "co.fs2"        %% "fs2-core"    % Version.fs2,
       "org.typelevel" %% "cats-effect" % Version.catsEffect,
       // https://github.com/portable-scala/portable-scala-reflect/issues/23
-      ("org.portable-scala"      %%
-        "portable-scala-reflect" % Version.portableReflect).cross(CrossVersion.for3Use2_13),
+      ("org.portable-scala"     %%
+        "portable-scala-reflect" % Version.portableReflect).cross(
+        CrossVersion.for3Use2_13),
       "org.scalameta" %% "munit-diff" % Version.munitDiff
     ) ++
       (if (scalaVersion.value.startsWith("3.")) Nil
@@ -74,7 +75,8 @@ lazy val munitDiffShadingSettings = Seq(
 lazy val coreJVM = core.jvm
   .settings(
     libraryDependencies ++= Seq(
-      ("org.scala-js"   %% "scalajs-stubs" % Version.scalajsStubs % "provided").cross(CrossVersion.for3Use2_13),
+      ("org.scala-js" %% "scalajs-stubs" % Version.scalajsStubs %
+        "provided").cross(CrossVersion.for3Use2_13),
       "junit" % "junit" % Version.junit % Optional
     ),
     munitDiffShadingSettings
@@ -97,15 +99,17 @@ lazy val frameworkJVM = framework.jvm
   .settings(
     libraryDependencies ++= Seq(
       "org.scala-sbt"   % "test-interface"     % Version.testInterface,
-      ("org.scala-js"   %%
-        "scalajs-stubs" % Version.scalajsStubs % "provided").cross(CrossVersion.for3Use2_13)
+      ("org.scala-js"  %%
+        "scalajs-stubs" % Version.scalajsStubs % "provided").cross(
+        CrossVersion.for3Use2_13)
     )
   )
 
 lazy val frameworkJS = framework.js
   .settings(
     libraryDependencies ++= Seq(
-      ("org.scala-js" %% "scalajs-test-interface" % scalaJSVersion).cross(CrossVersion.for3Use2_13).platform(Platform.jvm)
+      ("org.scala-js" %% "scalajs-test-interface" % scalaJSVersion).cross(
+        CrossVersion.for3Use2_13).platform(Platform.jvm)
     )
   )
 
