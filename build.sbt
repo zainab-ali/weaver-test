@@ -221,7 +221,7 @@ lazy val docs = project
     discipline.jvm,
     docsOutput.jvm)
   .settings(
-    moduleName := "weaver-docs",
+    moduleName := "weaver-site",
     name       := "Weaver documentation",
     mdocExtraArguments += "--allowCodeFenceIndented",
     // Source location file paths in md files are not relative to the
