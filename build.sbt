@@ -55,8 +55,6 @@ lazy val core = crossProject(JVMPlatform, JSPlatform, NativePlatform)
       // https://github.com/portable-scala/portable-scala-reflect/issues/23
       ("org.portable-scala"      %%
         "portable-scala-reflect" % Version.portableReflect).cross(CrossVersion.for3Use2_13),
-      "org.typelevel" %% "scalac-compat-annotation" %
-        Version.scalacCompatAnnotation,
       "org.scalameta" %% "munit-diff" % Version.munitDiff
     ) ++
       (if (scalaVersion.value.startsWith("3.")) Nil
