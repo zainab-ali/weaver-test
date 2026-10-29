@@ -189,7 +189,7 @@ lazy val docsOutput = crossProject(JVMPlatform)
   .settings(
     moduleName := "docs-output",
     name       := "output for documentation",
-    watchSources += (ThisBuild / baseDirectory).value / "docs",
+    watchSources += Def.uncached((ThisBuild / baseDirectory).value / "docs"),
     libraryDependencies ++= Seq(
       "com.lihaoyi" %% "fansi" % "0.4.0"
     )
@@ -230,7 +230,7 @@ lazy val docs = project
     // empty string.
     Compile / fork := true,
     envVars        := Map("WEAVER_SOURCE_URL" -> ""),
-    watchSources += (ThisBuild / baseDirectory).value / "docs",
+    watchSources += Def.uncached((ThisBuild / baseDirectory).value / "docs"),
     libraryDependencies ++= Seq(
       "org.http4s"    %% "http4s-ember-client" % Version.http4s,
       "org.typelevel" %% "cats-laws"           % Version.catsLaws
